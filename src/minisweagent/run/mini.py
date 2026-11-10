@@ -4,6 +4,7 @@
 # Read this first: https://mini-swe-agent.com/latest/usage/mini/  (usage)
 
 import os
+import litellm
 from pathlib import Path
 from typing import Any
 
@@ -90,6 +91,7 @@ def main(
         },
     })
     config = recursive_merge(*configs)
+    #litellm.turn_on_debug()
 
     if (run_task := config.get("run", {}).get("task", UNSET)) is UNSET:
         console.print("[bold yellow]What do you want to do?")
@@ -101,6 +103,11 @@ def main(
     agent = get_agent(model, env, config.get("agent", {}), default_type="interactive")
     agent.run(run_task)
     if (output_path := config.get("agent", {}).get("output_path")):
+        
+        if os.path.exists("recipes_full.csv"):
+            os.remove("recipes_full.csv")
+            console.print("[bold yellow]Removed temporary file.[/bold yellow]")
+
         console.print(f"Saved trajectory to [bold green]'{output_path}'[/bold green]")
     return agent
 
